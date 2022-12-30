@@ -15,13 +15,6 @@ app.use( '/api', AppRouters);
 //Incorporar con express
 app.use(express.static('public'));
 
-
-//Middleware Error
-app.use((error, req, res, next)=>{
-
-
-})
-
 //Puesto en Marcha
 app.listen(PORT, () => {
     console.log("El servidor esta levantado y corriendo por el puerto", PORT);

@@ -12,7 +12,7 @@ const validacionCampos = (req, res, next) =>{
         p.status = !p.status ? true : p.status;
         next();
     }else{ 
-        next("Uno o mas campos faltan completar");
+        return next("Uno o mas campos faltan completar");
     }
 }
 
