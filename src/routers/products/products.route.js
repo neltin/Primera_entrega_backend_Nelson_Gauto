@@ -1,20 +1,22 @@
 const {Router} = require('express');
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'public/img')
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.originalname)
+    }
+});
+
+
+const Uploader = multer({ storage });
+
 const router = Router();
 
 const ProductManager = require('../../ProductManager');
 const productos = new ProductManager('./src/dataProducts.json');
-
-//Middlrware
-const validacionCampos = (req, res, next) =>{
-    const p = req.body;
-
-    if(p.title && p.description && p.price && p.code && p.category && p.stock){
-        p.status = !p.status ? true : p.status;
-        next();
-    }else{ 
-        return next("Uno o mas campos faltan completar");
-    }
-}
 
 router.get('/', async (req, res) =>{
     //Traer todos los productos
@@ -55,19 +57,32 @@ router.get('/:pid', async (req, res) =>{
     })     
 })
 
-router.post('/', validacionCampos , async (req, res) => {
-    
-    const product =  await productos.addProduct(req.body);
-    if(product.status == 'error'){
-        return res.status(404).json({
+router.post('/', Uploader.array('thumbnails') ,  async (req, res) => {
+    const p = req.body;
+    let thumbnails = req.files ? (req.files.map(file => `/img/${file.originalname}`)) : []; 
+
+    if(p.title && p.description && p.price && p.code && p.category && p.stock){
+    const status= !p.status ? true : p.status;
+
+    const product =  await productos.addProduct( {...req.body, status: status, thumbnail: thumbnails} );
+
+        if(product.status == 'error'){
+            return res.status(404).json({
+                ...product
+            })
+        }
+
+        return res.status(220).json({
             ...product
-        })
+        }) 
+    }else{
+        if(product.status == 'error'){
+            return res.status(404).json({
+                status: "error",
+                error:`falta campos por completar`
+            })
+        }
     }
-
-    return res.status(220).json({
-        ...product
-    }) 
-
 })
 
 router.put('/:pid' , async (req, res) => {

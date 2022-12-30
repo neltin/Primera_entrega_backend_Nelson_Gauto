@@ -1,8 +1,12 @@
+const express = require('express');
 const {Router} = require('express');
 const ProductRoute =  require('./products/products.route');
 const CartRoute =  require('./carts/carts.route');
 
+
 const router = Router();
+
+
 
 //Rutas de producto
 router.use("/products", ProductRoute);
