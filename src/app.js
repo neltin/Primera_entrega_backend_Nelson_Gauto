@@ -10,7 +10,7 @@ app.use(express.json()); //Parse de los Objetos que van por Body
 app.use(express.urlencoded({ extended: true })); //Parseo de los formularios
 
 //Router
-app.use(AppRouters);
+app.use( '/api', AppRouters);
 
 //Incorporar con express
 app.use(express.static('public'));
